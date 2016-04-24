@@ -1,0 +1,402 @@
+extends layout_pure
+block content
+  //- #introHead
+  .container.containerIntro
+    .page-header
+      h3 專案管理
+    ul.list-group
+      .row
+        .col-sm-offset-1.col-sm-10
+          each val, index in allProjects
+            li.text-alignLeft.col-xs-12.list-group-item #{index} | #{val.title} | &#36;#{val.goalmoney} | Win: #{val.winnerList.length}
+              span.alignRight
+                .col-sm-6
+                  form.form-horizontal(action='/deleteProj/#{val.id}', onsubmit='return confirm("這是「移除」專案喔！你真的確定要移除嗎？");', method='POST')
+                    button.col-sm-12.btn.btn-default(type='submit')
+                      i.fa.fa-minus-circle
+                      | 移除
+                .col-sm-6
+                  a.col-sm-12.btn.btn-default(href='/postProj/#{val.id}')
+                    i.fa.fa-edit
+                    | 編輯 
+          a.col-sm-12.btn.btn-primary.marginTop(href='/postProj')
+            i.fa.fa-edit
+            | 新專案
+
+    if isEditing
+      .page-header
+        h3 編輯專案
+          br
+          small 編號(hid):#{thisProject.hid}
+      p
+      h6 抽獎管理
+
+      form.form-horizontal(action='/winnersGenerator/#{thisProject.id}', method='POST')
+        input(type='hidden', name='_csrf', value=_csrf)
+        .form-group
+          label.col-sm-4.control-label(for='feedBackObjNum') 回饋品數量
+          .col-sm-5
+            input.form-control(type='number', name='feedBackObjNum', id='feedBackObjNum', value='#{thisProject.feedBackObjNum}')
+        .form-group
+          label.col-sm-4.control-label(for='winnerSerials') 中獎序號
+          .col-sm-5
+            textarea.form-control(type='text', name='winnerSerials', id='winnerSerials', rows='4', disabled) #{thisProject.winnerSerials}
+        .form-group
+          .col-sm-offset-2.col-sm-8
+            table.table.table-hover.table-bordered.myRecordTable
+                thead
+                  tr
+                    th.col-xs-3 id
+                    th.col-xs-3 name
+                    th.col-xs-3 serial
+                    //- th.col-xs-4 serial
+                tbody#whoWin
+                  each winner in thisProject.winnerList
+                    tr
+                      td #{winner.wId}
+                      td #{winner.wName}
+                      td #{winner.serial}
+        //- .form-group
+        //-   label.col-sm-4.control-label(for='winnerSerials') 中獎人
+        //-   .col-sm-5
+        //-     textarea.form-control(type='text', name='whoWins', id='whoWins', rows='3', disabled) #{JSON.stringify(thisProject.winnerList)}  
+        //- .form-group
+        //-   .col-sm-offset-4.col-sm-4
+        //-     button.col-sm-12.btn.btn-primary(type='submit')
+        //-       i.fa.fa-pencil
+        //-       | 重新產生抽獎序號
+
+      hr
+      br 
+      h6 文案管理
+      form.form-horizontal(action='/updateProj/#{thisProject.id}', method='POST')
+        input(type='hidden', name='_csrf', value=_csrf)
+        .form-group
+          label.col-sm-4.control-label(for='title') 標題
+          .col-sm-5
+            input.form-control(type='text', name='title', id='title', value='#{thisProject.title}')
+        .form-group
+          label.col-sm-4.control-label(for='name') 案主
+          .col-sm-5
+            input.form-control(type='text', name='name', id='name', value='#{thisProject.hoster}')
+        .form-group
+          label.col-sm-4.control-label(for='abstract') 簡述
+          .col-sm-5
+            textarea.form-control(type='text', name='abstract', id='abstract', rows='6') #{thisProject.abstract}
+        .form-group
+          label.col-sm-4.control-label(for='video') 影片連結 (Only Youtube)
+          .col-sm-5
+            input.form-control(type='text', name='video', id='video', value='#{thisProject.main_video}')
+        .form-group
+          label.col-sm-4.control-label(for='money') 募資金額 (only 數字)
+          .col-sm-5
+            input.form-control(type='text', name='money', id='money', value='#{thisProject.goalmoney}')
+        .form-group
+          label.col-sm-4.control-label(for='bannerPImg') Banner橫幅圖(連結)
+          .col-sm-5
+            input.form-control(type='text', name='bannerPImg', id='bannerPImg', value='#{thisProject.bannerPImg}')
+        .form-group
+          label.col-sm-4.control-label(for='bannerColor') Banner 背景色(色碼)
+          .col-sm-5
+            input.form-control(type='text', name='bannerColor', id='bannerColor', value='#{thisProject.bannerColor}')
+        .form-group
+          label.col-sm-4.control-label(for='coverPImg') 封面圖(連結)
+          .col-sm-5
+            input.form-control(type='text', name='coverPImg', id='coverPImg', value='#{thisProject.coverPImg}')
+        //- .form-group
+        //-   label.col-sm-4.control-label(for='feedBackObjNum') 回饋品數量
+        //-   .col-sm-5
+        //-     input.form-control(type='number', name='feedBackObjNum', id='feedBackObjNum', value='#{thisProject.feedBackObjNum}', readonly=true) 
+        //- .form-group
+        //-   label.col-sm-4.control-label(for='winnerSerials') 中獎序號
+        //-   .col-sm-5
+        //-     textarea.form-control(type='text', name='winnerSerials', id='winnerSerials', value='#{thisProject.winnerSerials.join(",")}', rows='6', disabled=true)
+        .form-group
+          label.col-sm-4.control-label(for='payid') 歐付寶QuickPayId
+          .col-sm-5
+            input.form-control(type='text', name='payid', id='payid', value='#{thisProject.quickPayId}')
+        .form-group
+          label.col-sm-4.control-label(for='payInfo') 付款頁面說明
+          .col-sm-5
+            textarea.form-control(type='text', name='payInfo', id='payInfo', rows='6') !{thisProject.payInfo}
+             
+        .form-group
+          .col-sm-5
+            | 預覽
+          .col-sm-7
+            | 內文輸入
+          .showdown-body(ng-controller="editorCtrl", squeeze)
+            #editor-wrapper.container-showdown
+              #preview(sd-model-to-html='text')
+              textarea.form-control#editor(type='text', name='content', data-ng-model='text') #{thisProject.content}
+        .form-group
+          .col-sm-offset-3.col-sm-6
+            button.col-sm-12.btn.btn-primary(type='submit')
+              i.fa.fa-pencil
+              | 更新
+    if !isEditing
+      .page-header
+        h3 發案
+      p
+      form.form-horizontal(action='/postProj', method='POST')
+        input(type='hidden', name='_csrf', value=_csrf)
+        .form-group
+          label.col-sm-4.control-label(for='title') 標題
+          .col-sm-5
+            input.form-control(type='text', name='title', id='title',placeholder='Ex.【Loffo x 江峰】舞蹈、創作、重生')
+        .form-group
+          label.col-sm-4.control-label(for='name') 案主
+          .col-sm-5
+            input.form-control(type='text', name='name', id='name',placeholder='Ex. 江峰')
+        .form-group
+          label.col-sm-4.control-label(for='abstract') 簡述
+          .col-sm-5
+            textarea.form-control(type='text', name='abstract', id='abstract', rows='6', placeholder='Ex. 在生涯規劃上，決心走向藝術這條道路。對我而言，舞蹈是一種自我認識，找出自己與世界不同的方式，希望能接觸更多舞蹈訓練，能更加展現自我，並希望可以讓更多人去接觸、喜愛表演藝術。')
+        .form-group
+          label.col-sm-4.control-label(for='video') 影片連結 (Only Youtube)
+          .col-sm-5
+            input.form-control(type='text', name='video', id='video', placeholder='Ex. https://www.youtube.com/watch?v=dgXDBRpejN8')
+        .form-group
+          label.col-sm-4.control-label(for='money') 募資金額 (only 數字)
+          .col-sm-5
+            input.form-control(type='text', name='money', id='money', placeholder='Ex. 2000')
+        .form-group
+          label.col-sm-4.control-label(for='bannerPImg') Banner橫幅圖(連結)
+          .col-sm-5
+            input.form-control(type='text', name='bannerPImg', id='bannerPImg', placeholder='Ex. http://..jpg(寬長比3.0)')
+        .form-group
+          label.col-sm-4.control-label(for='bannerColor') Banner 背景色(色碼)
+          .col-sm-5
+            input.form-control(type='text', name='bannerColor', id='bannerColor', value='#fff')
+        .form-group
+          label.col-sm-4.control-label(for='coverPImg') 封面圖(連結)
+          .col-sm-5
+            input.form-control(type='text', name='coverPImg', id='coverPImg', placeholder='Ex. http://..jpg(寬長比1.35)')
+        .form-group
+          label.col-sm-4.control-label(for='feedBackObjNum') 回饋品數量
+          .col-sm-5
+            input.form-control(type='number', name='feedBackObjNum', id='feedBackObjNum', value=1)
+        
+        .form-group
+          .col-sm-5
+            | 預覽
+          .col-sm-7
+            | 內文輸入
+          .showdown-body(ng-controller="editorCtrl", squeeze)
+            #editor-wrapper.container-showdown
+              #preview(sd-model-to-html='text')
+              textarea.form-control#editor(type='text', name='content', data-ng-model='text')
+            //- .lateral-menu(pageslide='', ps-open='checked', ps-side='left', ps-squeeze='true')
+            //-   .lateral-menu-content
+            //-     .title Options
+            //-     .lateral-menu-content-inner
+            //-       div(ng-repeat='opt in checkOpts')
+            //-         input(id='checkOpt-{{$id}}', ng-click='updateOptions()', type='checkbox', ng-model='opt.value')
+            //-         label.inline(for='checkOpt-{{$id}}') {{opt.name}}
+            //-       hr
+            //-       div(ng-repeat='opt in valOpts')
+            //-         label(for='option-{opt.name}') {{opt.name}}
+            //-         input(id='option-{opt.name}', ng-change='updateOptions()', type='number', ng-model='opt.value')
+            //-       div
+            //-         label(for='showdownVersion') Showdown Version
+            //-         select#showdownVersion(ng-model='version', ng-options='v for v in versions', ng-change='loadVersion()')
+            //- //-modal
+            //- .modal-wrapper.ng-hide(ng-hide='!showModal')
+            //-   .modal-inner(aria-labelledby='modalTitle', aria-hidden='true', role='dialog')
+            //-     .modal-topbar
+            //-       span
+            //-         i   Limited to 1000 characters
+            //-       a.modal-close-btn(aria-label='Close', ng-click='showModal = false')
+            //-         i.fa.fa-lg.fa-close
+            //-     .link-area
+            //-       textarea#dlnk(style='resize: none;') {{hashTxt}}
+
+        .form-group
+          .col-sm-offset-3.col-sm-6
+            button.col-sm-12.btn.btn-primary(type='submit')
+              i.fa.fa-pencil
+              | 送出
+  
+
+      //- .form-group
+      //-   label.col-sm-4.control-label(for='bannerPImg') Banner橫幅
+      //-   .col-sm-5
+      //-     input#input-10(type='file', data-preview-file-type='text', accept='image/*', class='file-loading', name='bannerPImg')
+      //- .form-group
+      //-   label.col-sm-4.control-label(for='motivPImg') 動機圖
+      //-   .col-sm-5
+      //-     input#input-10(type='file', data-preview-file-type='text', accept='image/*', class='file-loading', name='motivPImg')
+      //- .form-group
+      //-   label.col-sm-4.control-label(for='profilePImg') 簡歷圖
+      //-   .col-sm-5
+      //-     input#input-10(type='file', data-preview-file-type='text', accept='image/*', class='file-loading', name='profilePImg')
+      //- .form-group
+      //-   label.col-sm-4.control-label(for='feedbackPImg') 回饋品圖
+      //-   .col-sm-5
+      //-     input#input-10(type='file', data-preview-file-type='text', accept='image/*', class='file-loading', name='feedbackPImg')               
+
+  script(src='/js/showdown/semver.js')
+  script(src='//ajax.googleapis.com/ajax/libs/angularjs/1.4.2/angular.js')
+  script(src='//ajax.googleapis.com/ajax/libs/angularjs/1.4.2/angular-sanitize.js')
+  script(src='//ajax.googleapis.com/ajax/libs/angularjs/1.4.2/angular-animate.js')
+  script(src='//ajax.googleapis.com/ajax/libs/angularjs/1.4.2/angular-route.js')
+  script(src='//ajax.googleapis.com/ajax/libs/angularjs/1.4.2/angular-cookies.js')
+  script(src='//cdn.rawgit.com/dpiccone/ng-pageslide/v1.0.4/dist/angular-pageslide-directive.js')
+  if thisProject
+    script(type='text/javascript')
+      | var saved_content=!{JSON.stringify(thisProject.content)};
+  script(src='/js/showdown/editor.js') 
+
+
+//- script(type='text/javascript').
+//-   var URL = window.URL || window.webkitURL || window.mozURL || window.msURL;
+//-   navigator.saveBlob = navigator.saveBlob || navigator.msSaveBlob || navigator.mozSaveBlob || navigator.webkitSaveBlob;
+//-   window.saveAs = window.saveAs || window.webkitSaveAs || window.mozSaveAs || window.msSaveAs;
+//-   // Because highlight.js is a bit awkward at times
+//-   var languageOverrides = {
+//-   js: 'javascript',
+//-   html: 'xml'
+//-   };
+//-   emojify.setConfig({ img_dir: 'emoji' });
+//-   var md = markdownit({
+//-   html: true,
+//-   highlight: function(code, lang){
+//-   if(languageOverrides[lang]) lang = languageOverrides[lang];
+//-   if(lang && hljs.getLanguage(lang)){
+//-   try {
+//-   return hljs.highlight(lang, code).value;
+//-   }catch(e){}
+//-   }
+//-   return '';
+//-   }
+//-   })
+//-   .use(markdownitFootnote);
+//-   var hashto;
+//-   function update(e){
+//-   setOutput(e.getValue());
+//-   clearTimeout(hashto);
+//-   hashto = setTimeout(updateHash, 1000);
+//-   }
+//-   function setOutput(val){
+//-   val = val.replace(/<equation>((.*?\\n)*?.*?)<\/equation>/ig, function(a, b){
+//-   return '<img src="http://latex.codecogs.com/png.latex?' + encodeURIComponent(b) + '" />';
+//-   });
+//-   var out = document.getElementById('out');
+//-   var old = out.cloneNode(true);
+//-   out.innerHTML = md.render(val);
+//-   emojify.run(out);
+//-   var allold = old.getElementsByTagName("*");
+//-   if (allold === undefined) return;
+//-   var allnew = out.getElementsByTagName("*");
+//-   if (allnew === undefined) return;
+//-   for (var i = 0, max = Math.min(allold.length, allnew.length); i < max; i++) {
+//-   if (!allold[i].isEqualNode(allnew[i])) {
+//-   out.scrollTop = allnew[i].offsetTop;
+//-   return;
+//-   }
+//-   }
+//-   }
+//-   var editor = CodeMirror.fromTextArea(document.getElementById('code'), {
+//-   mode: 'gfm',
+//-   lineNumbers: false,
+//-   matchBrackets: true,
+//-   lineWrapping: true,
+//-   theme: 'base16-light',
+//-   extraKeys: {"Enter": "newlineAndIndentContinueMarkdownList"}
+//-   });
+//-   editor.on('change', update);
+//-   document.addEventListener('drop', function(e){
+//-   e.preventDefault();
+//-   e.stopPropagation();
+//-   var reader = new FileReader();
+//-   reader.onload = function(e){
+//-   editor.setValue(e.target.result);
+//-   };
+//-   reader.readAsText(e.dataTransfer.files[0]);
+//-   }, false);
+//-   function saveAsMarkdown(){
+//-   save(editor.getValue(), "untitled.md");
+//-   }
+//-   function saveAsHtml() {
+//-   save(document.getElementById('out').innerHTML, "untitled.html");
+//-   }
+//-   document.getElementById('saveas-markdown').addEventListener('click', function() {
+//-   saveAsMarkdown();
+//-   hideMenu();
+//-   });
+//-   document.getElementById('saveas-html').addEventListener('click', function() {
+//-   saveAsHtml();
+//-   hideMenu();
+//-   });
+//-   function save(code, name){
+//-   var blob = new Blob([code], { type: 'text/plain' });
+//-   if(window.saveAs){
+//-   window.saveAs(blob, name);
+//-   }else if(navigator.saveBlob){
+//-   navigator.saveBlob(blob, name);
+//-   }else{
+//-   url = URL.createObjectURL(blob);
+//-   var link = document.createElement("a");
+//-   link.setAttribute("href",url);
+//-   link.setAttribute("download",name);
+//-   var event = document.createEvent('MouseEvents');
+//-   event.initMouseEvent('click', true, true, window, 1, 0, 0, 0, 0, false, false, false, false, 0, null);
+//-   link.dispatchEvent(event);
+//-   }
+//-   }
+//-   var menuVisible = false;
+//-   var menu = document.getElementById('menu');
+//-   function showMenu() {
+//-   menuVisible = true;
+//-   menu.style.display = 'block';
+//-   }
+//-   function hideMenu() {
+//-   menuVisible = false;
+//-   menu.style.display = 'none';
+//-   }
+//-   document.getElementById('close-menu').addEventListener('click', function(){
+//-   hideMenu();
+//-   });
+//-   document.addEventListener('keydown', function(e){
+//-   if(e.keyCode == 83 && (e.ctrlKey || e.metaKey)){
+//-   e.shiftKey ? showMenu() : saveAsMarkdown();
+//-   e.preventDefault();
+//-   return false;
+//-   }
+//-   if(e.keyCode === 27 && menuVisible){
+//-   hideMenu();
+//-   e.preventDefault();
+//-   return false;
+//-   }
+//-   });
+//-   function updateHash(){
+//-   window.location.hash = btoa( // base64 so url-safe
+//-   RawDeflate.deflate( // gzip
+//-   unescape(encodeURIComponent( // convert to utf8
+//-   editor.getValue()
+//-   ))
+//-   )
+//-   );
+//-   }
+//-   if(window.location.hash){
+//-   var h = window.location.hash.replace(/^#/, '');
+//-   if(h.slice(0,5) == 'view:'){
+//-   setOutput(decodeURIComponent(escape(RawDeflate.inflate(atob(h.slice(5))))));
+//-   document.body.className = 'view';
+//-   }else{
+//-   editor.setValue(
+//-   decodeURIComponent(escape(
+//-   RawDeflate.inflate(
+//-   atob(
+//-   h
+//-   )
+//-   )
+//-   ))
+//-   );
+//-   update(editor);
+//-   editor.focus();
+//-   }
+//-   }else{
+//-   update(editor);
+//-   editor.focus();
+//-   }

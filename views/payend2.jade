@@ -1,0 +1,68 @@
+extends layout
+
+block content
+  #introHead
+  .container.containerIntro
+    .row
+      h3.col-sm-offset-2.col-sm-8 您，就是那位幸運兒嗎
+    p
+    hr
+    .col-sm-12
+      .playgroundInfo.col-xs-12.col-sm-5
+        h1
+          small 現在可以體驗
+          br
+          | 立即開獎
+        hr
+        h6.infoText.col-md-offset-1.col-md-10.col-sm-12 說明:
+          br
+          | 您所獲得的贊助序號，將可以搖動獎機最多#{buynum}次，
+          br
+          | 並且即刻知道您是否就是幸運兒。
+          br
+          
+          | 馬上開始轉動吧！
+        .col-xs-12
+          h1#remainNum #{slotNum}次
+            small 剩餘
+          br
+        .col-sm-12
+          form#slotForm.form-horizontal
+            input(type='hidden', name='_csrf', value=_csrf)
+            .form-group
+              label.col-xs-5.col-sm-5.col-md-3.control-label.text-right(for='amount') 同時抽:
+              .col-xs-5.col-sm-6.col-md-5
+                input.col-xs-12.col-md-12.form-control(type='number', name='amount', id='amount', value='1')
+              .col-xs-offset-2.col-xs-8.col-sm-offset-2.col-sm-9.col-md-offset-0.col-md-4
+                a#confirmAmount.col-xs-12.col-md-12.btn.btn-primary
+                  | 確認
+              input.col-xs-12.col-md-12.form-control(type='hidden', name='fid', id='fid', value='#{fundId}')
+      .playground.col-xs-12.col-sm-7
+        svg#rTarget.animated.infinite.tada2.col-xs-offset-1.col-xs-10.col-md-offset-2.col-md-8(version='1.1', xmlns='http://www.w3.org/2000/svg', xmlns:xlink='http://www.w3.org/1999/xlink', x='0px', y='0px', viewbox='0 0 283.5 283.5', enable-background='new 0 0 283.5 283.5', xml:space='preserve')
+          g#rotateItems
+            rect#ph(fill='none', width='283.5', height='283.5')
+            g#bar
+              path(fill='#F4BE20', stroke='#E7BE20', stroke-width='3', stroke-miterlimit='10', d='M141.9,29.3c7.2,0,9.7,5,9.7,21.6\
+              c0,19.3-9.7,45,5.3,77.6c9.6,20.7,0,31.8-15.1,31.8c-15.4,0-25.1-11.2-15.4-31.8c15.4-32.6,6.2-60.1,6.2-77.6\
+              C132.8,34.4,134.7,29.3,141.9,29.3z')
+            g#center
+              circle(fill='#B3751E', cx='141.7', cy='141.6', r='11')
+            g#slotHandler
+              circle(fill='#C14235', stroke='#DA4C3C', stroke-width='5', stroke-miterlimit='10', cx='141.7', cy='37.6', r='13.4')
+        svg#btmTarget.col-xs-offset-1.col-xs-10.col-md-offset-2.col-md-8(version='1.1', xmlns='http://www.w3.org/2000/svg', xmlns:xlink='http://www.w3.org/1999/xlink', x='0px', y='0px', viewbox='0 0 283.5 283.5', enable-background='new 0 0 283.5 283.5', xml:space='preserve')
+          g#octagon
+            polygon(fill='#F0C8A5', stroke='#E9AE78', stroke-width='5', stroke-miterlimit='10', points='85.1,278.4 5,198.3 5,85 85.1,4.9 \
+198.4,4.9 278.5,85 278.5,198.3 198.4,278.4  ')
+            polygon(fill='#E9AE78', points='85.1,4.9 198.4,4.9 141.7,141.7  ')
+            polygon(fill='#E9AE78', points='278.6,85 278.6,198.3 141.7,141.6  ')
+            polygon(fill='#E9AE78', points='198.4,278.5 85.1,278.5 141.7,141.6  ')
+            polygon(fill='#E9AE78', points='5,198.3 5,85 141.8,141.6  ')
+        #gameHintText  
+      //- .col-sm-12
+      //-   .resultArea    
+    p 
+  include slotResultModel 
+  script.
+    var uid = '#{user.id}'
+    //- var slotEnd = '#{slotResult}'
+      

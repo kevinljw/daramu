@@ -1,0 +1,156 @@
+extends ../layout
+
+block content
+  .container.containerIntro
+    .page-header
+      h3 個人資訊
+    p
+    script.
+      userPic="#{user.profile.picture}"
+      usersList="#{ulist}"
+    form.form-horizontal(action='account/uploadPImg/'+user.id, method='POST', enctype='multipart/form-data')
+      input(type='hidden', name='_csrf', value=_csrf)
+      .form-group
+        label.col-sm-4.control-label(for='gravatar') 個人頭像
+        .col-sm-4
+          if user.profile.picture
+            .profileGrid(style='background: url(\'#{user.profile.picture}\') no-repeat;background-size: auto 100%; background-position: 50% 0; border-radius: 5px;')
+            //- img(src="#{user.profile.picture}", class='profile', width='180', height='180')
+          else 
+            img(src="img/default_profile.png", class='profile', width='180', height='180')
+      //- .form-group
+      //-   label.col-sm-4.control-label(for='userPImg') 上傳照片
+      //-   .col-sm-4
+      //-     input.file(id='input-1', type='file', data-preview-file-type='text',accept='image/*', name='userPImg')
+    form.form-horizontal(action='/account/profile', method='POST')
+      input(type='hidden', name='_csrf', value=_csrf)
+      
+      .form-group
+        label.col-sm-4.control-label(for='name') 姓名
+        .col-sm-4
+          input.form-control(type='text', name='name', id='name', placeholder='your name', value='#{user.profile.name}')
+      .form-group
+        label.col-sm-4.control-label(for='status') 身份
+        .col-sm-4
+          input.form-control(type='text', name='status', id='status', value='#{user.profile.status}', disabled)    
+      .form-group
+        label.col-sm-4.control-label(for='birth') 生日
+        .col-sm-4
+          input.form-control(type='date', name='birth', id='birth', min='1900-01-01' max='2015-12-31', value='#{user.profile.birth}')
+      .form-group
+        label.col-sm-4.control-label(for='email') Email
+        .col-sm-4
+          input.form-control(type='email', name='email', id='email', value='#{user.email}')
+      .form-group
+        label.col-sm-4.control-label(for='website') 個人連結
+        .col-sm-4
+          input.form-control(type='text', name='website', id='website', value='#{user.profile.website}')
+      .form-group
+        .col-sm-offset-4.col-sm-4
+          button.col-sm-12.btn.btn.btn-primary(type='submit')
+            i.fa.fa-pencilr
+            | 更新
+    p
+    .page-header.marginTop100#linkAcnt
+      h3 社群連結
+      //- p.lead Please enter your personal link to the following social media:
+    .form-horizontal
+      .form-group
+        //- .col-sm-offset-3.col-sm-4
+        //-   if user.instagram
+        //-     p: a.text-danger(href='/account/unlink/instagram') Unlink your Instagram account
+        //-   else
+        //-     p: a(href='/auth/instagram') Link your Instagram account
+        //- .col-sm-offset-3.col-sm-4
+        //-   if user.google
+        //-     p: a.text-danger(href='/account/unlink/google') Unlink your Google account
+        //-   else
+        //-     p: a(href='/auth/google') Link your Google account
+        .col-sm-offset-2.col-sm-8
+          .col-sm-6
+            .linkAcnt
+              if user.facebook
+                a.text-danger(href='/account/unlink/facebook')
+                  span.fa.fa-facebook-square
+                  p 取消連結你的 Facebook 帳戶
+              else
+                a(href='/auth/facebook')
+                  span.fa.fa-facebook-square
+                  p 連結你的 Facebook 帳戶
+          .col-sm-6
+            .linkAcnt
+              if user.twitter
+                a.text-danger(href='/account/unlink/twitter')
+                  span.fa.fa-twitter-square
+                  p 取消連結你的 Twitter 帳戶
+              else
+                a(href='/auth/twitter')
+                  span.fa.fa-twitter-square
+                  p 連結你的 Twitter 帳戶
+          //- .col-sm-4
+          //-   .linkAcnt
+          //-     if user.linkedin
+          //-       a.text-danger(href='/account/unlink/linkedin')
+          //-         span.fa.fa-linkedin-square
+          //-         p Unlink your LinkedIn account
+          //-     else
+          //-       a(href='/auth/linkedin')
+          //-         span.fa.fa-linkedin-square
+          //-         p Link your LinkedIn account
+    .page-header.marginTop100
+      h3 密碼更變
+
+    form.form-horizontal(action='/account/password', method='POST')
+      input(type='hidden', name='_csrf', value=_csrf)
+      .form-group
+        label.col-sm-4.control-label(for='password') 新密碼
+        .col-sm-4
+          input.form-control(type='password', name='password', id='password')
+      .form-group
+        label.col-sm-4.control-label(for='confirmPassword') 確認密碼
+        .col-sm-4
+          input.form-control(type='password', name='confirmPassword', id='confirmPassword')
+      .form-group
+        .col-sm-offset-4.col-sm-4
+          button.col-sm-12.btn.btn-primary(type='submit')
+            i.fa.fa-lock
+            | 變更
+    if user.profile.status=='admin'
+      .page-header.marginTop100
+        h3 管理員
+      form.form-horizontal(action='/authority', method='POST')
+        input(type='hidden', name='_csrf', value=_csrf)
+        each val, index in ulist
+          .form-group
+            label.col-sm-1.control-label(for='#{val.id}') #{index}
+            label.col-sm-3.control-label(for='#{val.id}') #{val.email}
+            label.col-sm-2.control-label(for='#{val.id}') #{val.profile.name}
+            .col-sm-6
+              label.col-sm-6(for='user_#{index}_1')
+                if val.profile.status=='guest' || val.profile.status=='fellow'
+                  input(type='radio', name='#{val.id}', id='user_#{index}_1', value='guest', checked)
+                else
+                  input(type='radio', name='#{val.id}', id='user_#{index}_1', value='guest')
+                | guest
+              label.col-sm-6(for='user_#{index}_3')
+                if val.profile.status=='admin'
+                  input(type='radio', name='#{val.id}', id='user_#{index}_3', value='admin', checked)
+                else
+                  input(type='radio', name='#{val.id}', id='user_#{index}_3', value='admin')
+                | admin
+        .form-group.marginTop
+          .col-sm-offset-4.col-sm-4
+            button.col-sm-12.btn.btn-primary(type='submit')
+              i.fa.fa-pencil
+              | Update
+    if user.profile.status=='admin'
+      .page-header.marginTop100
+        h3 刪除帳號
+      form.form-horizontal(action='/account/delete', method='POST')
+        .form-group
+          p.col-sm-offset-3.col-sm-6 You can delete your account, but keep in mind this action is irreversible.
+          input(type='hidden', name='_csrf', value=_csrf)
+          .col-sm-offset-4.col-sm-4
+            button.col-sm-12.btn.btn-danger(type='submit')
+              i.fa.fa-trash
+              | Delete my account
