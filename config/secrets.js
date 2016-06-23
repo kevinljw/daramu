@@ -58,7 +58,7 @@ module.exports = {
     // clientSecret: process.env.FACEBOOK_SECRET || '41860e58c256a3d7ad8267d3c1939a4a',
     clientID: process.env.FACEBOOK_ID || '1751258648430941',
     clientSecret: process.env.FACEBOOK_SECRET || '7483daed7e4c9e305025b7ae7862ba9d',
-    callbackURL: '/auth/facebook/callback',
+    callbackURL: 'http://loffo.cf/auth/facebook/callback',
     profileFields: ['id', 'email', 'gender', 'link', 'locale', 'displayName', 'timezone', 'updated_time', 'verified'],
     passReqToCallback: true
   },
